@@ -41,7 +41,7 @@ function toJson(cefOrig) {
 
   // extracting extension fields which are in key=value format
   const re = /(\w*)=/g;
-  const str = headers[7];
+  const str = headers[7].replace('\\=', 'THERE_IS_AN_EQUAL_SIGN_HERE_BRO');
   const exts = [];
   let m;
   /*eslint-disable*/
@@ -61,7 +61,7 @@ function toJson(cefOrig) {
     } else {
       nextPos = exts[index + 1].pos;
     }
-    ret.extension[ext.key] = str.substring(ext.pos + ext.key.length + 1, nextPos).trim();
+    ret.extension[ext.key.replace('THERE_IS_AN_EQUAL_SIGN_HERE_BRO', '=')] = str.substring(ext.pos + ext.key.length + 1, nextPos).trim().replace('THERE_IS_AN_EQUAL_SIGN_HERE_BRO', '=');
   });
 
   return ret;
