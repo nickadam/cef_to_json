@@ -14,18 +14,26 @@ function toJson(cefOrig) {
   const ret = {};
 
   if (cefVerPos > 0) {
-    ret.headerPrefix = cefOrig.substring(0, cefVerPos).trim();
+    ret.prefix = cefOrig.substring(0, cefVerPos).trim();
   }
 
-  ret.cefVersion = cef.charAt(4);
+  ret.header = {};
+
+  ret.header.version = cef.charAt(4);
   const headers = cef.split('|');
   if (headers.length < 7) {
     return undefined;
   }
 
   // extracting headers
-  [ret.deviceVendor, ret.deviceProduct, ret.deviceVersion, ret.deviceEventClassId,
-    ret.name, ret.agentSeverity] = headers.slice(1, 7);
+  [
+    ret.header.device_vendor,
+    ret.header.device_product,
+    ret.header.device_version,
+    ret.header.device_event_class_id,
+    ret.header.name,
+    ret.header.severity,
+  ] = headers.slice(1, 7);
 
   if (headers.length === 7) {
     return ret;
@@ -38,9 +46,13 @@ function toJson(cefOrig) {
   let m;
   /*eslint-disable*/
   while ((m = re.exec(str)) !== null) {
-    exts.push({key:m[1], pos:m.index});
+    exts.push({key: m[1], pos: m.index});
   }
   /* eslint-enable */
+
+  if (exts.length > 0) {
+    ret.extension = {};
+  }
 
   exts.forEach((ext, index) => {
     let nextPos;
@@ -49,7 +61,7 @@ function toJson(cefOrig) {
     } else {
       nextPos = exts[index + 1].pos;
     }
-    ret[ext.key] = str.substring(ext.pos + ext.key.length + 1, nextPos).trim();
+    ret.extension[ext.key] = str.substring(ext.pos + ext.key.length + 1, nextPos).trim();
   });
 
   return ret;
