@@ -41,7 +41,7 @@ function toJson(cefOrig) {
 
   // extracting extension fields which are in key=value format
   const re = /(\w*)=/g;
-  const str = headers[7].replace('\\=', 'THERE_IS_AN_EQUAL_SIGN_HERE_BRO');
+  const str = headers[7].replace(/\\=/g, 'THERE_IS_AN_EQUAL_SIGN_HERE_BRO');
   const exts = [];
   let m;
   /*eslint-disable*/
@@ -61,8 +61,24 @@ function toJson(cefOrig) {
     } else {
       nextPos = exts[index + 1].pos;
     }
-    ret.extension[ext.key.replace('THERE_IS_AN_EQUAL_SIGN_HERE_BRO', '=')] = str.substring(ext.pos + ext.key.length + 1, nextPos).trim().replace('THERE_IS_AN_EQUAL_SIGN_HERE_BRO', '=');
+    ret.extension[ext.key.replace(/THERE_IS_AN_EQUAL_SIGN_HERE_BRO/g, '=')] = str.substring(ext.pos + ext.key.length + 1, nextPos).trim().replace(/THERE_IS_AN_EQUAL_SIGN_HERE_BRO/g, '=');
   });
+
+  // replace labels
+  if (ret.extension) {
+    const keys = Object.keys(ret.extension);
+    const labels = keys.filter(x => /Label$/.test(x));
+    labels.forEach((label) => {
+      const valueKey = label.replace(/Label$/, '');
+      if (keys.indexOf(valueKey) !== -1) {
+        const key = ret.extension[label].replace(/"/g, '');
+        const value = ret.extension[valueKey];
+        ret.extension[key] = value;
+        delete ret.extension[label];
+        delete ret.extension[valueKey];
+      }
+    });
+  }
 
   return ret;
 }
