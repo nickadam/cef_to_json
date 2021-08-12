@@ -7,7 +7,6 @@
 function toJson(cefOrig) {
   const cefVerPos = cefOrig.indexOf('CEF:');
   if (cefVerPos < 0) {
-    console.log('Cannot find CEF version. Probably not a valid CEF string');
     return undefined;
   }
 
@@ -21,7 +20,6 @@ function toJson(cefOrig) {
   ret.cefVersion = cef.charAt(4);
   const headers = cef.split('|');
   if (headers.length < 7) {
-    console.log('Cannot find a valid CEF header.');
     return undefined;
   }
 
